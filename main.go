@@ -10,6 +10,8 @@ func main() {
 	// 创建一个gink引擎
 	engine := gink.New()
 
+	engine.Use(gink.Logger())
+
 	// 设置路由， 和handler函数
 	engine.GET("/index", func(ctx *gink.Context) {
 		ctx.HTML(http.StatusOK, "<h1>this is index</h1>")

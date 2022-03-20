@@ -18,6 +18,9 @@ type Context struct {
 	Params map[string]string
 	// response info
 	StatusCode int
+	// 中间件
+	handlers []HandlerFunc
+	index    int //记录当前执行到第几个中间件
 }
 
 func (c *Context) Param(key string) string {
@@ -31,6 +34,18 @@ func newContext(w http.ResponseWriter, req *http.Request) *Context {
 		Req:    req,
 		Path:   req.URL.Path,
 		Method: req.Method,
+		index:  -1,
+	}
+}
+
+// index是记录当前执行到第几个中间件，当在中间件中调用Next方法时，
+// 控制权交给了下一个中间件，直到调用到最后一个中间件，
+// 然后再从后往前，调用每个中间件在Next方法之后定义的部分。
+func (ctx *Context) Next() {
+	ctx.index++
+	s := len(ctx.handlers)
+	for ; ctx.index < s; ctx.index++ {
+		ctx.handlers[ctx.index](ctx)
 	}
 }
 

@@ -87,9 +87,11 @@ func (r *router) handle(ctx *Context) {
 	if n != nil {
 		ctx.Params = params // 在ctx中保存根据pattern解析的params
 		key := ctx.Method + "-" + n.pattern
-		r.handlers[key](ctx) //调用对应的handler
+		ctx.handlers = append(ctx.handlers, r.handlers[key]) //添加对应的handler，并在下面的Next()中一起调用
 	} else {
-		ctx.String(http.StatusNotFound, "404 NOT FOUND: %s\n", ctx.Path)
+		ctx.handlers = append(ctx.handlers, func(ctx *Context) {
+			ctx.String(http.StatusNotFound, "404 NOT FOUND: %s\n", ctx.Path)
+		})
 	}
-
+	ctx.Next()
 }
