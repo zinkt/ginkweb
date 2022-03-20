@@ -1,34 +1,63 @@
 package gink
 
 import (
+	"log"
 	"net/http"
 )
 
 // HandlerFunc defines the request handler used by gink
 type HandlerFunc func(*Context)
 
-// Engine implement the interface of ServeHTTP
-type Engine struct {
-	router *router
-}
+type (
+	RouterGroup struct {
+		prefix      string
+		middlewares []HandlerFunc
+		parent      *RouterGroup
+		engine      *Engine // 所有group共享一个engine，便于访问router
+	}
 
-// New is the constructor of gink.Engine
+	// Engine实现了ServeHTTP的接口
+	Engine struct {
+		*RouterGroup
+		router *router
+		groups []*RouterGroup // 保存所有group
+	}
+)
+
+// 构造器
 func New() *Engine {
-	return &Engine{router: newRouter()}
+	engine := &Engine{router: newRouter()}
+	engine.RouterGroup = &RouterGroup{engine: engine}
+	engine.groups = []*RouterGroup{engine.RouterGroup}
+	return engine
 }
 
-func (engine *Engine) addRoute(method string, pattern string, handler HandlerFunc) {
-	engine.router.addRoute(method, pattern, handler)
+// 用于创建新RouterGroup
+func (group *RouterGroup) Group(prefix string) *RouterGroup {
+	engine := group.engine
+	newGroup := &RouterGroup{
+		prefix: group.prefix + prefix,
+		parent: group,
+		engine: engine,
+	}
+	engine.groups = append(engine.groups, newGroup) // 创建后需要加入全局groups
+	return newGroup
+}
+
+func (group *RouterGroup) addRoute(method string, comp string, handler HandlerFunc) {
+	pattern := group.prefix + comp
+	log.Printf("Route %4s - %s", method, pattern)
+	group.engine.router.addRoute(method, pattern, handler)
 }
 
 // GET defines the method to add GET request
-func (engine *Engine) GET(pattern string, handler HandlerFunc) {
-	engine.addRoute("GET", pattern, handler)
+func (group *RouterGroup) GET(pattern string, handler HandlerFunc) {
+	group.addRoute("GET", pattern, handler)
 }
 
 // POST defines the method to add POST request
-func (engine *Engine) POST(pattern string, handler HandlerFunc) {
-	engine.addRoute("POST", pattern, handler)
+func (group *RouterGroup) POST(pattern string, handler HandlerFunc) {
+	group.addRoute("POST", pattern, handler)
 }
 
 // Run defines the method to start a http server
