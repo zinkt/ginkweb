@@ -1,8 +1,10 @@
 package gink
 
 import (
+	"html/template"
 	"log"
 	"net/http"
+	"path"
 	"strings"
 )
 
@@ -22,6 +24,9 @@ type (
 		*RouterGroup
 		router *router
 		groups []*RouterGroup // 保存所有group
+		// for template : html render
+		htmlTemplates *template.Template
+		funcMap       template.FuncMap
 	}
 )
 
@@ -30,6 +35,11 @@ func New() *Engine {
 	engine := &Engine{router: newRouter()}
 	engine.RouterGroup = &RouterGroup{engine: engine}
 	engine.groups = []*RouterGroup{engine.RouterGroup}
+	return engine
+}
+func Default() *Engine {
+	engine := New()
+	engine.Use(Logger(), Recovery())
 	return engine
 }
 
@@ -45,6 +55,38 @@ func (group *RouterGroup) Group(prefix string) *RouterGroup {
 	return newGroup
 }
 
+// 静态文件处理
+func (group *RouterGroup) createStaticHandler(relativePath string, fs http.FileSystem) HandlerFunc {
+	absPath := path.Join(group.prefix, relativePath)
+	fileServer := http.StripPrefix(absPath, http.FileServer(fs))
+	return func(ctx *Context) {
+		file := ctx.Param("filepath")
+		// 检查文件是否可用（存在/有权限读取）
+		if _, err := fs.Open(file); err != nil {
+			ctx.Status(http.StatusNotFound)
+			return
+		}
+		fileServer.ServeHTTP(ctx.Writer, ctx.Req)
+	}
+}
+func (group *RouterGroup) Static(relativePath string, root string) {
+	// 处理路径：系统路径root ---> web相对路径relativePath
+	handler := group.createStaticHandler(relativePath, http.Dir(root))
+	urlPattern := path.Join(relativePath, "/*filepath")
+	// 为静态文件，注册GET处理函数
+	group.GET(urlPattern, handler)
+}
+
+// **************模板渲染*****************
+
+func (engine *Engine) SetFuncMap(funcMap template.FuncMap) {
+	engine.funcMap = funcMap
+}
+func (engine *Engine) LoadHTMLGlob(pattern string) {
+	engine.htmlTemplates = template.Must(template.New("").Funcs(engine.funcMap).ParseGlob(pattern))
+}
+
+// 中间件函数
 // 向group中添加中间件
 func (group *RouterGroup) Use(middlewares ...HandlerFunc) {
 	group.middlewares = append(group.middlewares, middlewares...)
@@ -82,5 +124,6 @@ func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	}
 	ctx := newContext(w, req)
 	ctx.handlers = middlewares
+	ctx.engine = engine
 	engine.router.handle(ctx)
 }
