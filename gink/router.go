@@ -19,7 +19,7 @@ func newRouter() *router {
 }
 
 // 将pattern按'/'分割为parts并返回
-// 当某part以*开头时，不再转化后续parts（暂时）
+// 当某part以*开头时，不再转化后续parts（暂时），表示匹配了所有后续内容
 func parsePattern(pattern string) []string {
 	vs := strings.Split(pattern, "/")
 
@@ -49,7 +49,7 @@ func (r *router) addRoute(method string, pattern string, handler HandlerFunc) {
 	r.handlers[key] = handler
 }
 
-// 根据path匹配到一个对应的节点，并解析出匹配符（':''*'）的参数
+// 根据path（此处为用户传入的路径）匹配到一个对应的节点，并解析出匹配符（':''*'）的参数
 // 返回对应节点和参数
 func (r *router) getRoute(method string, path string) (*node, map[string]string) {
 	searchParts := parsePattern(path)
@@ -63,8 +63,9 @@ func (r *router) getRoute(method string, path string) (*node, map[string]string)
 
 	n := root.search(searchParts, 0)
 
-	if n != nil { // 解析出':'和'*'通配符的参数
+	if n != nil {
 		parts := parsePattern(n.pattern)
+		// 解析出':'和'*'通配符的参数
 		for index, part := range parts {
 			if part[0] == ':' {
 				params[part[1:]] = searchParts[index]
@@ -73,6 +74,7 @@ func (r *router) getRoute(method string, path string) (*node, map[string]string)
 			// 解析结果为"filepath" : "css/zinkt.css"
 			if part[0] == '*' && len(part) > 1 {
 				params[part[1:]] = strings.Join(searchParts[index:], "/")
+				// 解析到*即停止
 				break
 			}
 		}

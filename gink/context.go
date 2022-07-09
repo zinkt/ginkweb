@@ -6,28 +6,26 @@ import (
 	"net/http"
 )
 
+// 构建JSON数据时，显得更简洁
 type H map[string]interface{}
 
 type Context struct {
 	// origin objects
 	Writer http.ResponseWriter
 	Req    *http.Request
-	// request info
+	// 从Req中导出的信息
 	Path   string
 	Method string
+	// 解析后的路由参数
 	Params map[string]string
 	// response info
 	StatusCode int
 	// 中间件
 	handlers []HandlerFunc
-	index    int //记录当前执行到第几个中间件
-	// 模板部分：为了通过Context访问engine中的HTML模板
+	// 记录当前执行到第几个中间件
+	index int
+	// 为了通过Context访问engine中的HTML模板
 	engine *Engine
-}
-
-func (ctx *Context) Param(key string) string {
-	value, _ := ctx.Params[key]
-	return value
 }
 
 func newContext(w http.ResponseWriter, req *http.Request) *Context {
@@ -51,25 +49,64 @@ func (ctx *Context) Next() {
 	}
 }
 
+// 获取的参数是预定义的
+// 如：v2.GET("/hello/:name"...  ...ctx.Param("name")
+func (ctx *Context) Param(key string) string {
+	value := ctx.Params[key]
+	return value
+}
+
+// 获取url中?之后的请求参数
+func (ctx *Context) Query(key string) string {
+	return ctx.Req.URL.Query().Get(key)
+}
+
+// 获取post方式的form表单参数
 func (ctx *Context) PostForm(key string) string {
 	return ctx.Req.FormValue(key)
 }
 
-func (ctx *Context) Query(key string) string {
-	return ctx.Req.URL.Query().Get((key))
-}
+// 设置状态码
 func (ctx *Context) Status(code int) {
 	ctx.StatusCode = code
 	ctx.Writer.WriteHeader(code)
 }
+
+// 设置http请求头部信息，如内容格式 "Content-Type", "text/html"
 func (ctx *Context) SetHeader(key string, value string) {
 	ctx.Writer.Header().Set(key, value)
 }
+
+// 向ResponseWriter写回纯byte的数据
+func (ctx *Context) Data(code int, data []byte) {
+	ctx.Status(code)
+	ctx.Writer.Write(data)
+}
+
+// 向ResponseWriter写回text/html格式的数据
+// 描述???
+func (ctx *Context) HTML(code int, name string, data interface{}) {
+	ctx.SetHeader("Content-Type", "text/html")
+	ctx.Status(code)
+	// ExecuteTemplate applies the template associated with t
+	// that has the given name to the specified data object
+	// and writes the output to wr
+	// 执行模板：将data填入ctx.engine.htmlTemplates中名为name的模板
+	if err := ctx.engine.htmlTemplates.ExecuteTemplate(ctx.Writer, name, data); err != nil {
+		ctx.Fail(500, err.Error())
+	}
+}
+
+// 向ResponseWriter写回text/plain格式的数据
+// 数据源：以format格式的values
 func (ctx *Context) String(code int, format string, values ...interface{}) {
 	ctx.SetHeader("Content-Type", "text/plain")
 	ctx.Status(code)
 	ctx.Writer.Write([]byte(fmt.Sprintf(format, values...)))
 }
+
+// 向ResponseWriter写回JSON格式的数据
+// 数据源：obj
 func (ctx *Context) JSON(code int, obj interface{}) {
 	ctx.SetHeader("Content-Type", "application/json")
 	ctx.Status(code)
@@ -78,18 +115,8 @@ func (ctx *Context) JSON(code int, obj interface{}) {
 		http.Error(ctx.Writer, err.Error(), 500)
 	}
 }
-func (ctx *Context) Data(code int, data []byte) {
-	ctx.Status(code)
-	ctx.Writer.Write(data)
-}
-func (ctx *Context) HTML(code int, name string, data interface{}) {
-	ctx.SetHeader("Content-Type", "text/html")
-	ctx.Status(code)
-	if err := ctx.engine.htmlTemplates.ExecuteTemplate(ctx.Writer, name, data); err != nil {
-		ctx.Fail(500, err.Error())
-	}
-}
 
+// 向ResponseWriter写回失败信息
 func (ctx *Context) Fail(code int, errormsg string) {
 	ctx.Status(code)
 	ctx.Writer.Write([]byte(errormsg))

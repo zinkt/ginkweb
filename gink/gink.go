@@ -12,6 +12,7 @@ import (
 type HandlerFunc func(*Context)
 
 type (
+	// 只是包装了一层，addRoute()时加上前缀
 	RouterGroup struct {
 		prefix      string
 		middlewares []HandlerFunc
@@ -26,7 +27,8 @@ type (
 		groups []*RouterGroup // 保存所有group
 		// for template : html render
 		htmlTemplates *template.Template
-		funcMap       template.FuncMap
+		//自定义渲染函数
+		funcMap template.FuncMap
 	}
 )
 
@@ -56,10 +58,13 @@ func (group *RouterGroup) Group(prefix string) *RouterGroup {
 }
 
 // 静态文件处理
+// http.FileServer()方法返回的是fileHandler实例，fileHandler结构体实现了Handler接口中的ServerHTTP()方法。
 func (group *RouterGroup) createStaticHandler(relativePath string, fs http.FileSystem) HandlerFunc {
-	absPath := path.Join(group.prefix, relativePath)
-	fileServer := http.StripPrefix(absPath, http.FileServer(fs))
+	// absPath 如 /v1/assets/css/zinkt.css
+	wholePath := path.Join(group.prefix, relativePath)
+	fileServer := http.StripPrefix(wholePath, http.FileServer(fs))
 	return func(ctx *Context) {
+		// 此处获取真实用户请求的参数
 		file := ctx.Param("filepath")
 		// 检查文件是否可用（存在/有权限读取）
 		if _, err := fs.Open(file); err != nil {
@@ -69,6 +74,11 @@ func (group *RouterGroup) createStaticHandler(relativePath string, fs http.FileS
 		fileServer.ServeHTTP(ctx.Writer, ctx.Req)
 	}
 }
+
+// xxx.com/assets
+// 如/assets/js/zinkt.js 为 relativePath
+// root为系统中与本文件的相对路径
+// http.Dir()方法会返回http.Dir类型用于将字符串路径转换为文件系统
 func (group *RouterGroup) Static(relativePath string, root string) {
 	// 处理路径：系统路径root ---> web相对路径relativePath
 	handler := group.createStaticHandler(relativePath, http.Dir(root))
@@ -82,6 +92,8 @@ func (group *RouterGroup) Static(relativePath string, root string) {
 func (engine *Engine) SetFuncMap(funcMap template.FuncMap) {
 	engine.funcMap = funcMap
 }
+
+// ParseGlob() 解析pattern匹配到的所有HTML文件，将结果模板们与调用这个函数的*template相关联
 func (engine *Engine) LoadHTMLGlob(pattern string) {
 	engine.htmlTemplates = template.Must(template.New("").Funcs(engine.funcMap).ParseGlob(pattern))
 }
@@ -92,8 +104,9 @@ func (group *RouterGroup) Use(middlewares ...HandlerFunc) {
 	group.middlewares = append(group.middlewares, middlewares...)
 }
 
-func (group *RouterGroup) addRoute(method string, comp string, handler HandlerFunc) {
-	pattern := group.prefix + comp
+// group.prefix是本group的前缀
+func (group *RouterGroup) addRoute(method string, component string, handler HandlerFunc) {
+	pattern := group.prefix + component
 	log.Printf("Route %4s - %s", method, pattern)
 	group.engine.router.addRoute(method, pattern, handler)
 }

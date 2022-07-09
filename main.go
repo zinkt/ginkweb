@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/zinkt/ginkweb/gink"
+	"gink"
 )
 
 type student struct {
@@ -35,7 +35,7 @@ func main() {
 	engine.SetFuncMap(template.FuncMap{
 		"FormatAsDate": FormatAsDate,
 	})
-	engine.LoadHTMLGlob("templates/*")
+	engine.LoadHTMLGlob("./templates/*")
 	engine.Static("/assets", "./static")
 
 	// 设置路由， 和handler函数
@@ -57,6 +57,7 @@ func main() {
 		})
 	})
 	v1 := engine.Group("/v1")
+	// 括号为了好看
 	{
 		// v1.GET("/", func(ctx *gink.Context) {
 		// 	ctx.HTML(http.StatusOK, "<h1>hello this is /</h1>")

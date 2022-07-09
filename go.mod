@@ -1,6 +1,7 @@
-module ginkweb
+module ginkMain
 
 go 1.18
 
-require github.com/zinkt/ginkweb/gink v0.0.0
-replace github.com/zinkt/ginkweb/gink => ./gink
+require gink v0.0.0
+
+replace gink => ./gink

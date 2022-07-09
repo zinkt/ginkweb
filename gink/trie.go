@@ -1,15 +1,18 @@
 package gink
 
-import "strings"
+import (
+	"strings"
+)
 
 type node struct {
-	pattern  string  //待匹配路由，如/p/:lang
-	part     string  //路由中的一部分，如:lang
+	pattern  string  //到本届点处，的待匹配路由，如/p/:lang
+	part     string  //即本节点对应的part，路由中的一部分，如:lang
 	children []*node //子节点，如[doc, tutorial, intro]
-	isWild   bool    //是否精确匹配（:或*为true）
+	isWild   bool    //是否参数匹配（:或*为true）
 }
 
-// 返回n.children中第一个成功匹配的节点，用于插入
+// 辅助函数
+// 返回n.children中第一个成功匹配的节点，用于插入新part
 func (n *node) matchChild(part string) *node {
 	for _, child := range n.children {
 		if child.part == part || child.isWild {
@@ -19,6 +22,7 @@ func (n *node) matchChild(part string) *node {
 	return nil
 }
 
+// 辅助函数
 // 返回n.children中所有与part匹配成功的节点，用于查找
 func (n *node) matchChildren(part string) []*node {
 	nodes := make([]*node, 0)
@@ -31,7 +35,9 @@ func (n *node) matchChildren(part string) []*node {
 }
 
 // 添加路由时调用，递归插入节点，用于构建Trie
-// 尝试将parts[height:len(parts)]的part插入到节点n的子孙节点中
+// parts是已被分割的pattern
+// height是递归插入的“进度”
+// 尝试递归地将parts[height:len(parts)]的part插入到节点n的子孙节点中
 // 并将叶子节点的pattern赋值为最终的待匹配路由
 func (n *node) insert(pattern string, parts []string, height int) {
 	if len(parts) == height { // 所有part都插入完成
@@ -40,7 +46,7 @@ func (n *node) insert(pattern string, parts []string, height int) {
 	}
 	part := parts[height]
 	child := n.matchChild(part)
-	if child == nil { // 如果没有节点匹配成功，则新建节点并将其添加到子孙节点组中
+	if child == nil { // 如果没有儿子节点匹配成功，则新建节点并将其添加到子孙节点组中
 		child = &node{part: part, isWild: part[0] == ':' || part[0] == '*'}
 		n.children = append(n.children, child)
 	}
