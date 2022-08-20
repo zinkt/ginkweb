@@ -77,11 +77,12 @@ func (group *RouterGroup) createStaticHandler(relativePath string, fs http.FileS
 
 // xxx.com/assets
 // 如/assets/js/zinkt.js 为 relativePath
-// root为系统中与本文件的相对路径
 // http.Dir()方法会返回http.Dir类型用于将字符串路径转换为文件系统
+// root若为相对路径，则是相对于入口函数
 func (group *RouterGroup) Static(relativePath string, root string) {
 	// 处理路径：系统路径root ---> web相对路径relativePath
-	handler := group.createStaticHandler(relativePath, http.Dir(root))
+	s := http.Dir(root)
+	handler := group.createStaticHandler(relativePath, s)
 	urlPattern := path.Join(relativePath, "/*filepath")
 	// 为静态文件，注册GET处理函数
 	group.GET(urlPattern, handler)
