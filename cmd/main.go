@@ -6,8 +6,18 @@ import (
 	"net/http"
 	"time"
 
-	"gink"
+	"github.com/zinkt/ginkweb/gink"
+	"github.com/zinkt/ginkweb/ginkblog/routes"
 )
+
+func main() {
+	// ginkDemo()
+}
+
+func ginkblogDemo() {
+	g := routes.InitWebRoutes()
+	g.Run(":9999")
+}
 
 type student struct {
 	Name string
@@ -19,7 +29,7 @@ func FormatAsDate(t time.Time) string {
 	return fmt.Sprintf("%d-%02d-%02d", year, month, day)
 }
 
-func main() {
+func ginkDemo() {
 	// 创建一个gink引擎
 	engine := gink.New()
 	// 设置中间件

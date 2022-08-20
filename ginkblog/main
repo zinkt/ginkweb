@@ -1,0 +1,8 @@
+package main
+
+import "routes"
+
+func main() {
+	g := routes.InitWebRoutes()
+	g.Run(":9999")
+}
