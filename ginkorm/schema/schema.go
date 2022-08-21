@@ -58,3 +58,14 @@ func Parse(dest interface{}, d dialect.Dialect) *Schema {
 	}
 	return schema
 }
+
+// 将对象中的值平铺为sql语句中的 VALUES (, , , ...), (, , , ...)格式
+func (schema *Schema) RecordValues(dest interface{}) []interface{} {
+	destValue := reflect.Indirect(reflect.ValueOf(dest))
+	var fieldValues []interface{}
+	for _, field := range schema.Fields {
+		fieldValues = append(fieldValues, destValue.FieldByName(field.Name).Interface())
+	}
+	// fieldValues此处可以认为是[]string
+	return fieldValues
+}

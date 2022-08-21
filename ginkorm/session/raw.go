@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"strings"
 
+	"github.com/zinkt/ginkweb/ginkorm/clause"
 	"github.com/zinkt/ginkweb/ginkorm/dialect"
 	"github.com/zinkt/ginkweb/ginkorm/log"
 	"github.com/zinkt/ginkweb/ginkorm/schema"
@@ -16,8 +17,11 @@ type Session struct {
 	// SQL 语句中占位符的对应值
 	sqlVars []interface{}
 
-	dialect  dialect.Dialect
+	dialect dialect.Dialect
+	// 对象映射成的表
 	refTable *schema.Schema
+
+	clause clause.Clause
 }
 
 // 新建session
@@ -32,6 +36,7 @@ func New(db *sql.DB, dialect dialect.Dialect) *Session {
 func (s *Session) Clear() {
 	s.sql.Reset()
 	s.sqlVars = nil
+	s.clause = clause.Clause{}
 }
 
 // 返回session对应的db

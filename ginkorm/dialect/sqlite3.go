@@ -8,9 +8,10 @@ import (
 
 type sqlite3 struct{}
 
+// 检测sqlite3是否实现了Dialect接口
 var _ Dialect = (*sqlite3)(nil)
 
-// 将sqlite3的dialect注册到全局
+// 包第一次加载时，将sqlite3的dialect注册到全局
 func init() {
 	RegisterDialect("sqlite3", &sqlite3{})
 }
