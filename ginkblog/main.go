@@ -12,6 +12,7 @@ import (
 
 func main() {
 	// ginkDemo()
+	ginkblogDemo()
 }
 
 func ginkblogDemo() {

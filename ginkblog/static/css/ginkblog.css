@@ -1,0 +1,12 @@
+a {
+    text-decoration: none;
+}
+
+.non-decoration-link a:hover {
+    text-decoration: underline;
+    color: #212529;
+}
+
+.non-decoration-link {
+    color: #212529;
+}

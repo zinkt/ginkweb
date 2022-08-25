@@ -1,0 +1,47 @@
+{{define "article/detail"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {{template "layout/meta" .}}    
+    <title>detail</title>
+</head>
+<body>
+    {{template "layout/header" .}}
+    <div class="container col-10 col-lg-9 mt-5 pt-5">
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                <article class="post">
+                    <h3 class="post-title"><a href="#">{{.article.Title}}</a></h3>
+                    <p class="post-meta">
+                        <i class="fa-regular fa-clock"></i>
+                        {{.article.CreateTime}}
+                    </p>
+                    <hr>
+                    <div class="post-content" id="post-content">
+                        
+                    </div>
+                    <blockquote></blockquote>
+                    <p class="tags"></p>
+                </article>
+            </div>
+            <div class="col-12 col-lg-4">
+
+            </div>
+        </div>
+
+
+    </div>
+
+    
+
+
+</body>
+<script src="https://cdn.staticfile.org/marked/4.0.18/marked.min.js"></script>
+<script>
+    var content = ""
+    document.getElementById('post-content').innerHTML = 
+    marked.parse("# 基础知识\n\n这是基础知识描述\n\n## 第一部分\n\n## 第二部分\n\n```\nint main(){}```")
+</script>
+</html>
+
+{{end}}

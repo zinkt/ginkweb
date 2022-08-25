@@ -12,6 +12,8 @@
 
 ## 参考
 
-[gin](https://github.com/gin-gonic/gin)
-[xorm](https://github.com/go-xorm/xorm)
-[主页字符串动态效果：遗传算法](https://github.com/huzidaha/home)
+1. [gin](https://github.com/gin-gonic/gin)
+
+2. [xorm](https://github.com/go-xorm/xorm)
+
+3. [主页字符串动态效果：遗传算法](https://github.com/huzidaha/home)
