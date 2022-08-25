@@ -8,6 +8,7 @@ import (
 
 	"github.com/zinkt/ginkweb/gink"
 	"github.com/zinkt/ginkweb/ginkblog/routes"
+	"github.com/zinkt/ginkweb/ginkblog/storage"
 )
 
 func main() {
@@ -16,7 +17,8 @@ func main() {
 }
 
 func ginkblogDemo() {
-	g := routes.InitWebRoutes()
+	storage.CheckAndSnycArticles()
+	g := routes.InitWeb()
 	g.Run(":9999")
 }
 

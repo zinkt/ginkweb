@@ -1,15 +1,16 @@
 package models
 
+import (
+	"time"
+)
+
 type Article struct {
-	Id             uint
-	Title          string
-	Content        string
-	CateId         uint
-	CreateTime     int64
-	LastUpdateTime int64
+	Id       uint `ginkorm:"PRIMARY KEY"`
+	Title    string
+	Content  string
+	Category string
+	// dialect 中有对time.Time的转换
+	CreateTime     time.Time
+	LastUpdateTime time.Time
 	// tags? author?
 }
-
-// func GetArticleById(id int) *Article {
-
-// }

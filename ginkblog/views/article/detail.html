@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     {{template "layout/meta" .}}    
-    <title>detail</title>
+    <title>Detail</title>
 </head>
 <body>
     {{template "layout/header" .}}
@@ -14,7 +14,7 @@
                     <h3 class="post-title"><a href="#">{{.article.Title}}</a></h3>
                     <p class="post-meta">
                         <i class="fa-regular fa-clock"></i>
-                        {{.article.CreateTime}}
+                        {{.article.CreateTime | FormatAsDate}}
                     </p>
                     <hr>
                     <div class="post-content" id="post-content">
@@ -40,7 +40,7 @@
 <script>
     var content = ""
     document.getElementById('post-content').innerHTML = 
-    marked.parse("# 基础知识\n\n这是基础知识描述\n\n## 第一部分\n\n## 第二部分\n\n```\nint main(){}```")
+    marked.parse("{{.article.Content}}")
 </script>
 </html>
 

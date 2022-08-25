@@ -65,6 +65,7 @@ func (s *Session) Find(values interface{}) error {
 	return rows.Close()
 }
 
+// 接受 2 种入参，平铺开来的键值对和 map 类型的键值对
 // kv 为 map[string]interface{}
 // 或者 kv list : "Name", "Tom", "Age", 18
 func (s *Session) Update(kv ...interface{}) (int64, error) {
