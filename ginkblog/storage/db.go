@@ -41,8 +41,11 @@ func CheckAndSnycArticles() {
 	}
 	// 设置自增id
 	// ???多此一举而不设置AUTOINCREMENT的原因是，Insert()直接将Article中的id以空值0插入，拆解较为复杂，暂时搁置
-	count := loaded[0].Id
-	filepath.Walk(filepath.Join(utils.GetGoRunPath(), "storage"),
+	var count uint
+	if len(loaded) != 0 {
+		count = loaded[0].Id
+	}
+	filepath.Walk(filepath.Join(utils.GetGoRunPath(), "storage", "articles"),
 		func(path string, info fs.FileInfo, err error) error {
 			if err != nil {
 				log.Error(err)
@@ -57,14 +60,14 @@ func CheckAndSnycArticles() {
 					if art.LastUpdateTime != info.ModTime() {
 						bytes, err := ioutil.ReadFile(path)
 						if err != nil {
-							log.Error("failed to read %s", path)
+							log.Errorf("failed to read %s", path)
 							return err
 						}
 						n, err := s.Where("Id = ?", art.Id).Update("Content", string(bytes), "LastUpdateTime", info.ModTime())
 						if err != nil {
 							log.Error("Failed to update")
 						}
-						log.Info("Update %s success, %d row(s) affected", info.Name(), n)
+						log.Infof("Update %s success, %d row(s) affected", info.Name(), n)
 					}
 				} else {
 					bytes, err := ioutil.ReadFile(path)
@@ -76,15 +79,16 @@ func CheckAndSnycArticles() {
 						// ???
 						// 若不指定id，这里id在插入时会插入空值值0
 						Id:      count + 1,
-						Title:   info.Name(),
+						Title:   strings.Split(info.Name(), ".")[0],
 						Content: string(bytes),
 						// 路径的倒数第二个
 						Category:       tmp[len(tmp)-2],
 						CreateTime:     time.Now(),
 						LastUpdateTime: info.ModTime(),
+						Viewed:         0,
 					})
 					count++
-					log.Info("Load %s success", info.Name())
+					log.Infof("Load %s success", info.Name())
 				}
 			}
 			return nil

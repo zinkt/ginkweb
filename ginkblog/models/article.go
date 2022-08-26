@@ -12,5 +12,6 @@ type Article struct {
 	// dialect 中有对time.Time的转换
 	CreateTime     time.Time
 	LastUpdateTime time.Time
-	// tags? author?
+	Viewed         uint64
+	// author?
 }

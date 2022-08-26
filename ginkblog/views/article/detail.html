@@ -1,47 +1,65 @@
 {{define "article/detail"}}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    {{template "layout/meta" .}}    
+    {{template "layout/meta" .}}
     <title>Detail</title>
 </head>
+
 <body>
     {{template "layout/header" .}}
     <div class="container col-10 col-lg-9 mt-5 pt-5">
         <div class="row">
             <div class="col-12 col-lg-8">
                 <article class="post">
-                    <h3 class="post-title"><a href="#">{{.article.Title}}</a></h3>
+                    <h3 class="post-title non-decoration-link"><a href="#" class="text-body">{{.article.Title}}</a></h3>
                     <p class="post-meta">
                         <i class="fa-regular fa-clock"></i>
-                        {{.article.CreateTime | FormatAsDate}}
+                        {{.article.CreateTime | FormatAsDate}} |
+
+                        <i class="fa-solid fa-tags"></i>
+                        <a href="#">{{.article.Category}}</a> |
+
+                        <i class="fa-solid fa-eye"></i>
+                        {{.article.Viewed}} 浏览 |
                     </p>
                     <hr>
                     <div class="post-content" id="post-content">
-                        
+                        {{.article.Content}}
                     </div>
                     <blockquote></blockquote>
-                    <p class="tags"></p>
+                    <small class="p-3">编辑于{{.article.LastUpdateTime | FormatAsDate}}</small>
                 </article>
             </div>
             <div class="col-12 col-lg-4">
-
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa-regular fa-face-grin-squint"></i>
+                        关于我
+                    </div>
+                    <div class="card-body">
+                        zinkt
+                        <br>
+                        西南大学2019级本科生
+                    </div>
+                </div>
             </div>
         </div>
 
 
     </div>
 
-    
+
 
 
 </body>
 <script src="https://cdn.staticfile.org/marked/4.0.18/marked.min.js"></script>
 <script>
-    var content = ""
-    document.getElementById('post-content').innerHTML = 
-    marked.parse("{{.article.Content}}")
+    document.getElementById('post-content').innerHTML =
+        marked.parse(document.getElementById('post-content').innerHTML)
 </script>
+
 </html>
 
 {{end}}

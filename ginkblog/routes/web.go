@@ -27,15 +27,15 @@ func InitWeb() *gink.Engine {
 
 	category := g.Group("/category")
 	{
-		category.GET("/coding", nil)
-		category.GET("/share", nil)
-		category.GET("/thinking", nil)
+		category.GET("/coding/:atitle", controllers.ArticleDetailByTitle)
+		category.GET("/share/:atitle", controllers.ArticleDetailByTitle)
+		category.GET("/thinking/:atitle", controllers.ArticleDetailByTitle)
 	}
 
 	archives := g.Group("/archives")
 	{
 		archives.GET("/", nil)
-		archives.GET("/:aid", controllers.ArticleDetail)
+		archives.GET("/:aid", controllers.ArticleDetailById)
 	}
 
 	g.GET("/about", nil)

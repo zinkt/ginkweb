@@ -57,7 +57,8 @@ func (s *Session) Raw(sql string, values ...interface{}) *Session {
 // 执行sql
 func (s *Session) Exec() (result sql.Result, err error) {
 	defer s.Clear()
-	log.Info(s.sql.String(), s.sqlVars)
+	// debug 调试时开启
+	// log.Info(s.sql.String(), s.sqlVars)
 	if result, err = s.DB().Exec(s.sql.String(), s.sqlVars...); err != nil {
 		log.Error(err)
 	}
@@ -67,14 +68,16 @@ func (s *Session) Exec() (result sql.Result, err error) {
 // 查询返回一条记录
 func (s *Session) QueryRow() *sql.Row {
 	defer s.Clear()
-	log.Info(s.sql.String(), s.sqlVars)
+	// debug 调试时开启
+	// log.Info(s.sql.String(), s.sqlVars)
 	return s.DB().QueryRow(s.sql.String(), s.sqlVars...)
 }
 
 // 查询返回多行记录
 func (s *Session) QueryRows() (rows *sql.Rows, err error) {
 	defer s.Clear()
-	log.Info(s.sql.String(), s.sqlVars)
+	// debug 调试时开启
+	// log.Info(s.sql.String(), s.sqlVars)
 	if rows, err = s.DB().Query(s.sql.String(), s.sqlVars...); err != nil {
 		log.Error(err)
 	}

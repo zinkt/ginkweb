@@ -112,7 +112,7 @@ func (ctx *Context) JSON(code int, obj interface{}) {
 	ctx.Status(code)
 	encoder := json.NewEncoder(ctx.Writer)
 	if err := encoder.Encode((obj)); err != nil {
-		http.Error(ctx.Writer, err.Error(), 500)
+		panic(err)
 	}
 }
 
