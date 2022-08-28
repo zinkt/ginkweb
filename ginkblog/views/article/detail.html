@@ -32,19 +32,7 @@
                     <small class="p-3">编辑于{{.article.LastUpdateTime | FormatAsDate}}</small>
                 </article>
             </div>
-            <div class="col-12 col-lg-4">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fa-regular fa-face-grin-squint"></i>
-                        关于我
-                    </div>
-                    <div class="card-body">
-                        zinkt
-                        <br>
-                        西南大学2019级本科生
-                    </div>
-                </div>
-            </div>
+            {{template "layout/sider" .}}
         </div>
 
 

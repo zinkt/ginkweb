@@ -10,6 +10,14 @@
 
 ## ginkblog
 
+
+## TODO
+
+1. 谷歌翻译 google_translate_element
+2. 文章详情目录
+3. 新增cache，支持缓存
+
+
 ## 参考
 
 1. [gin](https://github.com/gin-gonic/gin)

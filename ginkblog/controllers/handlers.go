@@ -45,3 +45,40 @@ func ArticleDetailByTitle(c *gink.Context) {
 	}
 	c.HTML(http.StatusOK, "article/detail", data)
 }
+
+func CategoryArticlesIndex(c *gink.Context) {
+	tmp := strings.Split(c.Path, "/")
+	articles := GetArticlesByCate(tmp[len(tmp)-1])
+	if len(articles) > 5 {
+		articles = articles[:5]
+	}
+	for i := 0; i < len(articles); i++ {
+		articles[i].Content = articles[i].Content[:46] + "..."
+	}
+	data := gink.H{
+		"articleList": articles,
+		"page":        1,
+	}
+
+	c.HTML(http.StatusOK, "article/list", data)
+}
+func CategoryArticlesPaging(c *gink.Context) {
+	tmp := strings.Split(c.Path, "/")
+	curpage, err := strconv.Atoi(c.Param("page"))
+	if err != nil {
+		log.Error("Failed to get page")
+	}
+	articles := GetArticlesByCate(tmp[len(tmp)-2])
+	if len(articles) > 5 {
+		articles = articles[(curpage-1)*5 : curpage*5]
+	}
+	for i := 0; i < len(articles); i++ {
+		articles[i].Content = articles[i].Content[:46] + "..."
+	}
+	data := gink.H{
+		"articleList": articles,
+		"curpage":     curpage,
+	}
+
+	c.HTML(http.StatusOK, "article/list", data)
+}

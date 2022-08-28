@@ -2,15 +2,61 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     {{template "layout/meta" .}}
     <title>Document</title>
 </head>
+
 <body>
     {{template "layout/header" .}}
-    
-    
+    <div class="container col-10 col-lg-9 mt-5 pt-5">
+        <div class="row">
+            <div class="col-12 col-lg-8">
+                {{range $art := .articleList}}
+                <article class="post">
+                    <h3 class="post-title non-decoration-link"><a href="#" class="text-body">{{$art.Title}}</a></h3>
+                    <p class="post-meta">
+                        <i class="fa-regular fa-clock"></i>
+                        {{$art.CreateTime | FormatAsDate}} |
+
+                        <i class="fa-solid fa-tags"></i>
+                        <a href="#">{{$art.Category}}</a> |
+
+                        <i class="fa-solid fa-eye"></i>
+                        {{$art.Viewed}} 浏览 |
+                    </p>
+                    <hr>
+                    <div class="post-content" id="post-content">
+                        {{$art.Content}}
+                    </div>
+                    <blockquote></blockquote>
+                    <p class="more">
+                        <a href="/category/{{$art.Category}}/{{$art.Title}}">查看更多-></a>
+                    </p>
+                </article>
+                {{end}}
+                <nav>
+                    <ul class="pagination">
+                        <!-- {{if eq .curpage 1}}disabled{{end}} -->
+                        <li class="page-item "><a class="page-link" href="#">«</a></li>
+                        <li class="page-item"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">»</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- sider -->
+            {{template "layout/sider" .}}
+        </div>
+
+
+    </div>
+
 </body>
+
 </html>
 
 {{end}}

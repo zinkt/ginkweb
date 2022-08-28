@@ -25,8 +25,17 @@ func InitWeb() *gink.Engine {
 
 	g.GET("/", controllers.Index)
 
+	// 不相信用户输入doge
 	category := g.Group("/category")
 	{
+		category.GET("/coding", controllers.CategoryArticlesIndex)
+		category.GET("/share", controllers.CategoryArticlesIndex)
+		category.GET("/thinking", controllers.CategoryArticlesIndex)
+
+		category.GET("/coding/:page", controllers.CategoryArticlesPaging)
+		category.GET("/share/:page", controllers.CategoryArticlesPaging)
+		category.GET("/thinking/:page", controllers.CategoryArticlesPaging)
+
 		category.GET("/coding/:atitle", controllers.ArticleDetailByTitle)
 		category.GET("/share/:atitle", controllers.ArticleDetailByTitle)
 		category.GET("/thinking/:atitle", controllers.ArticleDetailByTitle)

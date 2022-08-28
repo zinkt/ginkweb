@@ -36,8 +36,8 @@ func CheckAndSnycArticles() {
 	s.OrderBy("Id DESC").Find(&loaded)
 	// 组织成 [Category]/[Title] : *models.Article的形式确定某文件是否已发布
 	loadedMap := make(map[string]*models.Article, len(loaded))
-	for _, v := range loaded {
-		loadedMap[v.Category+"/"+v.Title] = &v
+	for i := 0; i < len(loaded); i++ {
+		loadedMap[loaded[i].Category+"/"+loaded[i].Title] = &loaded[i]
 	}
 	// 设置自增id
 	// ???多此一举而不设置AUTOINCREMENT的原因是，Insert()直接将Article中的id以空值0插入，拆解较为复杂，暂时搁置
@@ -55,9 +55,9 @@ func CheckAndSnycArticles() {
 				// 便于获取category
 				tmp := strings.Split(path, "/")
 				// 如果已经发布过
-				if art, exists := loadedMap[tmp[len(tmp)-2]+"/"+info.Name()]; exists {
+				if art, exists := loadedMap[tmp[len(tmp)-2]+"/"+strings.Split(info.Name(), ".")[0]]; exists {
 					// 若修改过，则更新
-					if art.LastUpdateTime != info.ModTime() {
+					if !art.LastUpdateTime.Equal(info.ModTime()) {
 						bytes, err := ioutil.ReadFile(path)
 						if err != nil {
 							log.Errorf("failed to read %s", path)

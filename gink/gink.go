@@ -2,7 +2,6 @@ package gink
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"path"
 	"strings"
@@ -108,7 +107,6 @@ func (group *RouterGroup) Use(middlewares ...HandlerFunc) {
 // group.prefix是本group的前缀
 func (group *RouterGroup) addRoute(method string, component string, handler HandlerFunc) {
 	pattern := group.prefix + component
-	log.Printf("Route %4s - %s", method, pattern)
 	group.engine.router.addRoute(method, pattern, handler)
 }
 

@@ -33,3 +33,13 @@ func GetArticleByCateAndTitle(cate, title string) *models.Article {
 	s.Where("Category = ? AND Title = ?", cate, title).Update("Viewed", a.Viewed)
 	return a
 }
+
+func GetArticlesByCate(cate string) []models.Article {
+	// 待优化
+	s := storage.DB.NewSession()
+	s.Model(&models.Article{})
+	var articles []models.Article
+	s.Where("Category = ?", cate).OrderBy("LastUpdateTime").Find(&articles)
+
+	return articles
+}
