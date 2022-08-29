@@ -53,9 +53,10 @@ func CheckAndSnycArticles() {
 			}
 			if !info.IsDir() {
 				// 便于获取category
-				tmp := strings.Split(path, "/")
+				tmp := strings.Split(path[strings.Index(path, "articles"):], "/")
+
 				// 如果已经发布过
-				if art, exists := loadedMap[tmp[len(tmp)-2]+"/"+strings.Split(info.Name(), ".")[0]]; exists {
+				if art, exists := loadedMap[tmp[1]+"/"+strings.Split(info.Name(), ".")[0]]; exists {
 					// 若修改过，则更新
 					if !art.LastUpdateTime.Equal(info.ModTime()) {
 						bytes, err := ioutil.ReadFile(path)
@@ -82,7 +83,7 @@ func CheckAndSnycArticles() {
 						Title:   strings.Split(info.Name(), ".")[0],
 						Content: string(bytes),
 						// 路径的倒数第二个
-						Category:       tmp[len(tmp)-2],
+						Category:       tmp[1],
 						CreateTime:     time.Now(),
 						LastUpdateTime: info.ModTime(),
 						Viewed:         0,
