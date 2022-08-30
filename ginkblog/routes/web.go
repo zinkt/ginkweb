@@ -23,6 +23,7 @@ func InitWeb() *gink.Engine {
 
 	// 此处filepath.Join()会Clean掉多余的separator，插入"OS specific Separator"
 	g.Static("/static", filepath.Join(utils.GetGoRunPath(), "static"))
+	g.StaticFile("/favicon.ico", filepath.Join(utils.GetGoRunPath(), "static", "img", "favicon.ico"))
 	g.LoadHTMLGlob(filepath.Join(utils.GetGoRunPath(), "views", "*", "*.html"))
 
 	g.GET("/", controllers.Index)

@@ -59,7 +59,6 @@ func (group *RouterGroup) Group(prefix string) *RouterGroup {
 // 静态文件处理
 // http.FileServer()方法返回的是fileHandler实例，fileHandler结构体实现了Handler接口中的ServerHTTP()方法。
 func (group *RouterGroup) createStaticHandler(relativePath string, fs http.FileSystem) HandlerFunc {
-	// absPath 如 /v1/assets/css/zinkt.css
 	wholePath := path.Join(group.prefix, relativePath)
 	fileServer := http.StripPrefix(wholePath, http.FileServer(fs))
 	return func(ctx *Context) {
@@ -85,6 +84,16 @@ func (group *RouterGroup) Static(relativePath string, root string) {
 	urlPattern := path.Join(relativePath, "/*filepath")
 	// 为静态文件，注册GET处理函数
 	group.GET(urlPattern, handler)
+}
+
+func (group *RouterGroup) StaticFile(relativePath string, root string) {
+	if strings.Contains(relativePath, ":") || strings.Contains(relativePath, "*") {
+		panic("URL parameters can not be used when serving a static file")
+	}
+	handler := func(c *Context) {
+		http.ServeFile(c.Writer, c.Req, root)
+	}
+	group.GET(relativePath, handler)
 }
 
 // **************模板渲染*****************

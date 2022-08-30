@@ -19,7 +19,7 @@ func main() {
 func ginkblogDemo() {
 	storage.CheckAndSnycArticles()
 	g := routes.InitWeb()
-	g.Run(":9999")
+	g.Run(":80")
 }
 
 type student struct {
