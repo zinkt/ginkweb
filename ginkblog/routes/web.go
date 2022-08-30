@@ -17,6 +17,8 @@ func InitWeb() *gink.Engine {
 	// 添加自定义模板渲染函数
 	g.SetFuncMap(template.FuncMap{
 		"FormatAsDate": utils.FormatAsDate,
+		"Plus":         utils.Plus,
+		"Minus":        utils.Minus,
 	})
 
 	// 此处filepath.Join()会Clean掉多余的separator，插入"OS specific Separator"
@@ -28,17 +30,14 @@ func InitWeb() *gink.Engine {
 	// 不相信用户输入doge
 	category := g.Group("/category")
 	{
-		category.GET("/coding", controllers.CategoryArticlesIndex)
-		category.GET("/share", controllers.CategoryArticlesIndex)
-		category.GET("/thinking", controllers.CategoryArticlesIndex)
+		category.GET("/coding", controllers.CategoryArticleListIndex)
+		category.GET("/share", controllers.CategoryArticleListIndex)
+		category.GET("/thinking", controllers.CategoryArticleListIndex)
 
-		category.GET("/coding/:page", controllers.CategoryArticlesPaging)
-		category.GET("/share/:page", controllers.CategoryArticlesPaging)
-		category.GET("/thinking/:page", controllers.CategoryArticlesPaging)
+		category.GET("/coding/:page", controllers.CategoryArticleListPaging)
+		category.GET("/share/:page", controllers.CategoryArticleListPaging)
+		category.GET("/thinking/:page", controllers.CategoryArticleListPaging)
 
-		category.GET("/coding/:atitle", controllers.ArticleDetailByTitle)
-		category.GET("/share/:atitle", controllers.ArticleDetailByTitle)
-		category.GET("/thinking/:atitle", controllers.ArticleDetailByTitle)
 	}
 
 	archives := g.Group("/archives")

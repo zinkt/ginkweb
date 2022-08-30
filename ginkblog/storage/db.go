@@ -3,6 +3,7 @@ package storage
 import (
 	"io/fs"
 	"io/ioutil"
+	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -34,10 +35,10 @@ func CheckAndSnycArticles() {
 	// 获取已发布过的文章列表
 	var loaded []models.Article
 	s.OrderBy("Id DESC").Find(&loaded)
-	// 组织成 [Category]/[Title] : *models.Article的形式确定某文件是否已发布
+	// 组织成[Path] : *models.Article的形式确定某文件是否已发布
 	loadedMap := make(map[string]*models.Article, len(loaded))
 	for i := 0; i < len(loaded); i++ {
-		loadedMap[loaded[i].Category+"/"+loaded[i].Title] = &loaded[i]
+		loadedMap[loaded[i].RelativePath] = &loaded[i]
 	}
 	// 设置自增id
 	// ???多此一举而不设置AUTOINCREMENT的原因是，Insert()直接将Article中的id以空值0插入，拆解较为复杂，暂时搁置
@@ -46,22 +47,31 @@ func CheckAndSnycArticles() {
 		count = loaded[0].Id
 	}
 	filepath.Walk(filepath.Join(utils.GetGoRunPath(), "storage", "articles"),
-		func(path string, info fs.FileInfo, err error) error {
+		func(fullpath string, info fs.FileInfo, err error) error {
 			if err != nil {
 				log.Error(err)
 				return err
 			}
-			if !info.IsDir() {
-				// 便于获取category
-				tmp := strings.Split(path[strings.Index(path, "articles"):], "/")
-
+			if info.IsDir() {
+				return nil
+			}
+			filename := info.Name()
+			filesuffix := path.Ext(filename)
+			fileprefix := strings.TrimSuffix(filename, filesuffix)
+			gorunpath := utils.GetGoRunPath()
+			relativePath := fullpath[len(gorunpath)+len("/storage/articles/"):]
+			cate := strings.Split(relativePath, "/")[0]
+			// 如果是这些后缀的文件才载入	未来用配置文件的方式
+			suffixes := [...]string{".md", ".txt"}
+			if utils.HasSuffixes(filesuffix, suffixes[:]) {
+				// 便于获取category，即tmp[1]
 				// 如果已经发布过
-				if art, exists := loadedMap[tmp[1]+"/"+strings.Split(info.Name(), ".")[0]]; exists {
+				if art, exists := loadedMap[relativePath]; exists {
 					// 若修改过，则更新
 					if !art.LastUpdateTime.Equal(info.ModTime()) {
-						bytes, err := ioutil.ReadFile(path)
+						bytes, err := ioutil.ReadFile(fullpath)
 						if err != nil {
-							log.Errorf("failed to read %s", path)
+							log.Errorf("failed to read %s", fullpath)
 							return err
 						}
 						n, err := s.Where("Id = ?", art.Id).Update("Content", string(bytes), "LastUpdateTime", info.ModTime())
@@ -71,19 +81,20 @@ func CheckAndSnycArticles() {
 						log.Infof("Update %s success, %d row(s) affected", info.Name(), n)
 					}
 				} else {
-					bytes, err := ioutil.ReadFile(path)
+					bytes, err := ioutil.ReadFile(fullpath)
 					if err != nil {
-						log.Error("failed to read %s", path)
+						log.Error("failed to read %s", fullpath)
 						return err
 					}
 					s.Insert(&models.Article{
 						// ???
 						// 若不指定id，这里id在插入时会插入空值值0
 						Id:      count + 1,
-						Title:   strings.Split(info.Name(), ".")[0],
+						Title:   fileprefix,
 						Content: string(bytes),
 						// 路径的倒数第二个
-						Category:       tmp[1],
+						Category:       cate,
+						RelativePath:   relativePath,
 						CreateTime:     time.Now(),
 						LastUpdateTime: info.ModTime(),
 						Viewed:         0,

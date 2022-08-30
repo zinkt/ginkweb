@@ -4,12 +4,12 @@
 
 <head>
     {{template "layout/meta" .}}
-    <title>Detail</title>
+    <title>{{.article.Title}} - zinkt</title>
 </head>
 
 <body>
     {{template "layout/header" .}}
-    <div class="container col-10 col-lg-9 mt-5 pt-5">
+    <div class="container col-lg-11 mt-5 pt-5">
         <div class="row">
             <div class="col-12 col-lg-8">
                 <article class="post">
@@ -19,7 +19,7 @@
                         {{.article.CreateTime | FormatAsDate}} |
 
                         <i class="fa-solid fa-tags"></i>
-                        <a href="#">{{.article.Category}}</a> |
+                        <a href="/category/{{.article.Category}}">{{.article.Category}}</a> |
 
                         <i class="fa-solid fa-eye"></i>
                         {{.article.Viewed}} 浏览 |

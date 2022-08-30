@@ -16,6 +16,8 @@
 1. 谷歌翻译 google_translate_element
 2. 文章详情目录
 3. 新增cache，支持缓存
+4. 归档页面时间线
+5. 侧边栏美化
 
 
 ## 参考

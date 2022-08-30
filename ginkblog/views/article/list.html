@@ -5,45 +5,78 @@
 
 <head>
     {{template "layout/meta" .}}
-    <title>Document</title>
+    <title>{{.category}} - zinkt</title>
 </head>
 
 <body>
     {{template "layout/header" .}}
-    <div class="container col-10 col-lg-9 mt-5 pt-5">
+    <div class="container col-lg-11 mt-5 pt-5">
         <div class="row">
             <div class="col-12 col-lg-8">
                 {{range $art := .articleList}}
                 <article class="post">
-                    <h3 class="post-title non-decoration-link"><a href="#" class="text-body">{{$art.Title}}</a></h3>
+                    <h3 class="post-title non-decoration-link"><a href="/archives/{{$art.Id}}"
+                            class="text-body">{{$art.Title}}</a></h3>
                     <p class="post-meta">
                         <i class="fa-regular fa-clock"></i>
                         {{$art.CreateTime | FormatAsDate}} |
 
                         <i class="fa-solid fa-tags"></i>
-                        <a href="#">{{$art.Category}}</a> |
+                        <a href="/category/{{$art.Category}}">{{$art.Category}}</a> |
 
                         <i class="fa-solid fa-eye"></i>
                         {{$art.Viewed}} 浏览 |
                     </p>
-                    <hr>
-                    <div class="post-content" id="post-content">
+                    <div class="post-content">
                         {{$art.Content}}
                     </div>
                     <blockquote></blockquote>
                     <p class="more">
-                        <a href="/category/{{$art.Category}}/{{$art.Title}}">查看更多-></a>
+                        <a href="/archives/{{$art.Id}}">查看更多-></a>
                     </p>
                 </article>
+                <hr>
                 {{end}}
-                <nav>
+                <nav class="offset-3 p-2">
                     <ul class="pagination">
-                        <!-- {{if eq .curpage 1}}disabled{{end}} -->
-                        <li class="page-item "><a class="page-link" href="#">«</a></li>
-                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item"><a class="page-link" href="#">»</a></li>
+                        {{if (gt .curpage 1)}}
+                        <li class="page-item"><a class="page-link"
+                                href="/category/{{.category}}/{{Minus .curpage 1}}">«</a></li>
+                        <li class="page-item"><a class="page-link" href="/category/{{.category}}/1">1</a></li>
+                        {{end}}
+                        {{if (gt (Minus .curpage 4) 1)}}
+                        <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                        {{end}}
+                        {{if (gt (Minus .curpage 3) 1)}}<li class="page-item"><a class="page-link"
+                                href="/category/{{.category}}/{{Minus .curpage 3}}">{{Minus .curpage 3}}</a></li>
+                        {{end}}
+                        {{if (gt (Minus .curpage 2) 1)}}<li class="page-item"><a class="page-link"
+                                href="/category/{{.category}}/{{Minus .curpage 2}}">{{Minus .curpage 2}}</a></li>
+                        {{end}}
+                        {{if (gt (Minus .curpage 1) 1)}}<li class="page-item"><a class="page-link"
+                                href="/category/{{.category}}/{{Minus .curpage 1}}">{{Minus .curpage 1}}</a></li>
+                        {{end}}
+
+                        <li class="page-item active"><a class="page-link" href="#">{{.curpage}}</a></li>
+
+                        {{if (lt (Plus .curpage 1) .totalPage)}}<li class="page-item"><a class="page-link"
+                                href="/category/{{.category}}/{{Plus .curpage 1}}">{{Plus .curpage 1}}</a></li>
+                        {{end}}
+                        {{if (lt (Plus .curpage 2) .totalPage)}}<li class="page-item"><a class="page-link"
+                                href="/category/{{.category}}/{{Plus .curpage 2}}">{{Plus .curpage 2}}</a></li>
+                        {{end}}
+                        {{if (lt (Plus .curpage 3) .totalPage)}}<li class="page-item"><a class="page-link"
+                                href="/category/{{.category}}/{{Plus .curpage 3}}">{{Plus .curpage 3}}</a></li>
+                        {{end}}
+                        {{if (lt (Plus .curpage 4) .totalPage)}}
+                        <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                        {{end}}
+                        {{if (lt .curpage .totalPage)}}
+                        <li class="page-item"><a class="page-link"
+                                href="/category/{{.category}}/{{.totalPage}}">{{.totalPage}}</a></li>
+                        <li class="page-item"><a class="page-link"
+                                href="/category/{{.category}}/{{Plus .curpage 1}}">»</a></li>
+                        {{end}}
                     </ul>
                 </nav>
             </div>
@@ -52,10 +85,16 @@
             {{template "layout/sider" .}}
         </div>
 
-
     </div>
 
 </body>
+<script src="https://cdn.staticfile.org/marked/4.0.18/marked.min.js"></script>
+<script>
+    var contents = document.getElementsByClassName('post-content');
+    for (c in contents) {
+        contents[c].innerHTML = marked.parse(contents[c].innerHTML)
+    }
+</script>
 
 </html>
 

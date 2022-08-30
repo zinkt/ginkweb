@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/zinkt/ginkweb/gink"
+	"github.com/zinkt/ginkweb/ginkblog/utils"
 	"github.com/zinkt/ginkweb/ginkorm/log"
 )
 
@@ -33,52 +34,60 @@ func ArticleDetailById(c *gink.Context) {
 
 }
 
-func ArticleDetailByTitle(c *gink.Context) {
+func CategoryArticleListIndex(c *gink.Context) {
 	tmp := strings.Split(c.Path, "/")
-	article := GetArticleByCateAndTitle(tmp[len(tmp)-2], c.Param("atitle"))
-	if article == nil {
+	cate := tmp[len(tmp)-1]
+	CategoryArticleListPageN(c, cate, 1)
+}
+func CategoryArticleListPaging(c *gink.Context) {
+	tmp := strings.Split(strings.TrimSuffix(c.Path, "/"), "/")
+	cate := tmp[len(tmp)-2]
+	curpage, err := strconv.Atoi(c.Param("page"))
+	if err != nil || curpage < 1 {
+		log.Error("Failed to get page")
 		c.HTML(http.StatusNotFound, "index/404", nil)
 		return
 	}
-	data := gink.H{
-		"article": article,
-	}
-	c.HTML(http.StatusOK, "article/detail", data)
+	CategoryArticleListPageN(c, cate, curpage)
 }
 
-func CategoryArticlesIndex(c *gink.Context) {
-	tmp := strings.Split(c.Path, "/")
-	articles := GetArticlesByCate(tmp[len(tmp)-1])
-	if len(articles) > 5 {
-		articles = articles[:5]
+func CategoryArticleListPageN(c *gink.Context, cate string, n int) {
+	articles := GetArticlesByCate(cate)
+	totalPage := (len(articles) + 4) / 5
+	if articles == nil || n > totalPage {
+		c.HTML(http.StatusNotFound, "index/404", nil)
+		return
 	}
-	for i := 0; i < len(articles); i++ {
-		articles[i].Content = articles[i].Content[:46] + "..."
-	}
+	articles = articles[(n-1)*5 : utils.Min(n*5, len(articles))]
+	GenerateAbstract(articles)
 	data := gink.H{
 		"articleList": articles,
-		"page":        1,
+		"curpage":     n,
+		"category":    cate,
+		"totalPage":   totalPage,
 	}
-
 	c.HTML(http.StatusOK, "article/list", data)
 }
-func CategoryArticlesPaging(c *gink.Context) {
-	tmp := strings.Split(c.Path, "/")
+
+func ArticleListPage(c *gink.Context) {
 	curpage, err := strconv.Atoi(c.Param("page"))
-	if err != nil {
+	if err != nil || curpage < 1 {
 		log.Error("Failed to get page")
+		c.HTML(http.StatusNotFound, "index/404", nil)
+		return
 	}
-	articles := GetArticlesByCate(tmp[len(tmp)-2])
-	if len(articles) > 5 {
-		articles = articles[(curpage-1)*5 : curpage*5]
+	articles := GetAllArticles()
+	totalPage := (len(articles) + 4) / 5
+	if articles == nil || curpage > totalPage {
+		c.HTML(http.StatusNotFound, "index/404", nil)
+		return
 	}
-	for i := 0; i < len(articles); i++ {
-		articles[i].Content = articles[i].Content[:46] + "..."
-	}
+	articles = articles[(curpage-1)*5 : utils.Min(curpage*5, len(articles))]
+	GenerateAbstract(articles)
 	data := gink.H{
 		"articleList": articles,
 		"curpage":     curpage,
+		"totalPage":   totalPage,
 	}
-
 	c.HTML(http.StatusOK, "article/list", data)
 }
