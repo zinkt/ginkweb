@@ -1,4 +1,3 @@
-[TOC]
 # socket基础
 
 ## 文件操作
@@ -27,8 +26,10 @@ ssize_t read(int fd, void *buf, size_t nbytes);
 
 ## socket函数及数据类型
 
-\#include <sys/socket.h>  
+```c
+#include <sys/socket.h>
 int socket(int domain, int type, int protocol);
+```
 
 - domain此套接字要使用的协议族信息，主要为PF_INET?AF_INET
 - type数据传输的类型，流式SOCK_STREAM，或数据报式SOCK_DGRAM

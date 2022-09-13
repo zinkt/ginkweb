@@ -9,10 +9,10 @@
 
 <body>
     {{template "layout/header" .}}
-    <div class="container col-lg-11 mt-5 pt-5">
+    <div class="container col-lg-11">
         <div class="row">
-            <div class="col-12 col-lg-8">
-                <article class="post">
+            <div class="col-12 col-lg-9">
+                <article class="post pt-5">
                     <h3 class="post-title non-decoration-link"><a href="#" class="text-body">{{.article.Title}}</a></h3>
                     <p class="post-meta">
                         <i class="fa-regular fa-clock"></i>
@@ -24,12 +24,14 @@
                         <i class="fa-solid fa-eye"></i>
                         {{.article.Viewed}} 浏览 |
                     </p>
-                    <hr>
-                    <div class="post-content" id="post-content">
-                        {{.article.Content}}
-                    </div>
-                    <blockquote></blockquote>
-                    <small class="p-3">编辑于{{.article.LastUpdateTime | FormatAsDate}}</small>
+                    <section class="border border-1 px-4 pt-4">
+                        <!-- 文章正文 -->
+                        <div class="markdown-body entry-content" id="post-content">{{.article.Content | Unescaped}}</div>
+                    </section>
+                    <blockquote class="my-3">
+                        编辑于{{.article.LastUpdateTime | FormatAsDate}}
+                    </blockquote>
+
                 </article>
             </div>
             {{template "layout/sider" .}}
@@ -38,15 +40,8 @@
 
     </div>
 
-
-
-
 </body>
-<script src="https://cdn.staticfile.org/marked/4.0.18/marked.min.js"></script>
-<script>
-    document.getElementById('post-content').innerHTML =
-        marked.parse(document.getElementById('post-content').innerHTML)
-</script>
+<script defer src="/static/js/toc.js"></script>
 
 </html>
 

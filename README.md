@@ -1,6 +1,8 @@
 # ginkweb
 
-模仿gin，xorm，构建的一个个人博客系统
+模仿gin，xorm，实现web框架gink以及orm框架ginkorm
+
+并基于它们构建的一个个人博客系统，尽可能少地直接使用框架
 
 ## gink
 
@@ -14,7 +16,7 @@
 ## TODO
 
 1. 谷歌翻译 google_translate_element
-2. 文章详情目录
+2. ~~文章详情目录~~
 3. 新增cache，支持缓存
 4. 归档页面时间线
 5. 侧边栏美化

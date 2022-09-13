@@ -9,6 +9,7 @@ import (
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/shurcooL/github_flavored_markdown"
 	"github.com/zinkt/ginkweb/ginkblog/models"
 	"github.com/zinkt/ginkweb/ginkblog/utils"
 	"github.com/zinkt/ginkweb/ginkorm"
@@ -18,7 +19,7 @@ import (
 var DB *ginkorm.Engine
 
 func init() {
-	e, err := ginkorm.NewEngine("sqlite3", filepath.Join(utils.GetGoRunPath(), "storage", "ginkblog.db"))
+	e, err := ginkorm.NewEngine("sqlite3", filepath.Join(utils.GetGoRunPath(), "storage", "ginkblog_test.db"))
 	if err != nil {
 		log.Error(err)
 		panic(err)
@@ -74,6 +75,9 @@ func CheckAndSnycArticles() {
 							log.Errorf("failed to read %s", fullpath)
 							return err
 						}
+						// 解析md文章为html
+						bytes = github_flavored_markdown.Markdown(bytes)
+						// 更新数据库
 						n, err := s.Where("Id = ?", art.Id).Update("Content", string(bytes), "LastUpdateTime", info.ModTime())
 						if err != nil {
 							log.Error("Failed to update")
@@ -86,6 +90,8 @@ func CheckAndSnycArticles() {
 						log.Error("failed to read %s", fullpath)
 						return err
 					}
+					// 解析md文章为html
+					bytes = github_flavored_markdown.Markdown(bytes)
 					s.Insert(&models.Article{
 						// ???
 						// 若不指定id，这里id在插入时会插入空值值0

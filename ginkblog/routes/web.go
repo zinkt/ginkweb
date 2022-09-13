@@ -19,6 +19,7 @@ func InitWeb() *gink.Engine {
 		"FormatAsDate": utils.FormatAsDate,
 		"Plus":         utils.Plus,
 		"Minus":        utils.Minus,
+		"Unescaped":    utils.Unescaped,
 	})
 
 	// 此处filepath.Join()会Clean掉多余的separator，插入"OS specific Separator"

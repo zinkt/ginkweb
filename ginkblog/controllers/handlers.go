@@ -28,7 +28,8 @@ func ArticleDetailById(c *gink.Context) {
 	}
 	// article.Viewed += 1
 	data := gink.H{
-		"article": article,
+		"article":        article,
+		"requireCatalog": true,
 	}
 	c.HTML(http.StatusOK, "article/detail", data)
 
@@ -61,10 +62,11 @@ func CategoryArticleListPageN(c *gink.Context, cate string, n int) {
 	articles = articles[(n-1)*5 : utils.Min(n*5, len(articles))]
 	GenerateAbstract(articles)
 	data := gink.H{
-		"articleList": articles,
-		"curpage":     n,
-		"category":    cate,
-		"totalPage":   totalPage,
+		"articleList":    articles,
+		"curpage":        n,
+		"category":       cate,
+		"totalPage":      totalPage,
+		"requireCatalog": false,
 	}
 	c.HTML(http.StatusOK, "article/list", data)
 }
@@ -85,9 +87,10 @@ func ArticleListPage(c *gink.Context) {
 	articles = articles[(curpage-1)*5 : utils.Min(curpage*5, len(articles))]
 	GenerateAbstract(articles)
 	data := gink.H{
-		"articleList": articles,
-		"curpage":     curpage,
-		"totalPage":   totalPage,
+		"articleList":    articles,
+		"curpage":        curpage,
+		"totalPage":      totalPage,
+		"requireCatalog": false,
 	}
 	c.HTML(http.StatusOK, "article/list", data)
 }

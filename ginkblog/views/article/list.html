@@ -10,11 +10,11 @@
 
 <body>
     {{template "layout/header" .}}
-    <div class="container col-lg-11 mt-5 pt-5">
+    <div class="container col-lg-11">
         <div class="row">
-            <div class="col-12 col-lg-8">
+            <div class="col-12 col-lg-9">
                 {{range $art := .articleList}}
-                <article class="post">
+                <article class="post pt-5">
                     <h3 class="post-title non-decoration-link"><a href="/archives/{{$art.Id}}"
                             class="text-body">{{$art.Title}}</a></h3>
                     <p class="post-meta">
@@ -27,18 +27,17 @@
                         <i class="fa-solid fa-eye"></i>
                         {{$art.Viewed}} 浏览 |
                     </p>
-                    <div class="post-content">
-                        {{$art.Content}}
-                    </div>
-                    <blockquote></blockquote>
-                    <p class="more">
-                        <a href="/archives/{{$art.Id}}">查看更多-></a>
-                    </p>
+                    <section class="border border-1 px-4 pt-4">
+                        <div class="markdown-body entry-content" id="post-content">{{$art.Content |
+                            Unescaped}}</div>
+                        <p class="more pt-3">
+                            <a href="/archives/{{$art.Id}}">查看更多-></a>
+                        </p>
+                    </section>
                 </article>
-                <hr>
                 {{end}}
-                <nav class="offset-3 p-2">
-                    <ul class="pagination">
+                <nav class="pt-4">
+                    <ul class="pagination justify-content-center">
                         {{if (gt .curpage 1)}}
                         <li class="page-item"><a class="page-link"
                                 href="/category/{{.category}}/{{Minus .curpage 1}}">«</a></li>
@@ -88,13 +87,6 @@
     </div>
 
 </body>
-<script src="https://cdn.staticfile.org/marked/4.0.18/marked.min.js"></script>
-<script>
-    var contents = document.getElementsByClassName('post-content');
-    for (c in contents) {
-        contents[c].innerHTML = marked.parse(contents[c].innerHTML)
-    }
-</script>
 
 </html>
 
