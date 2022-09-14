@@ -17,7 +17,7 @@
                 <article class="post pt-5">
                     <h3 class="post-title non-decoration-link"><a href="/archives/{{$art.Id}}"
                             class="text-body">{{$art.Title}}</a></h3>
-                    <p class="post-meta">
+                    <p class="post-meta non-decoration-link">
                         <i class="fa-regular fa-clock"></i>
                         {{$art.CreateTime | FormatAsDate}} |
 
@@ -30,7 +30,7 @@
                     <section class="border border-1 px-4 pt-4">
                         <div class="markdown-body entry-content" id="post-content">{{$art.Content |
                             Unescaped}}</div>
-                        <p class="more pt-3">
+                        <p class="more pt-3 non-decoration-link">
                             <a href="/archives/{{$art.Id}}">查看更多-></a>
                         </p>
                     </section>

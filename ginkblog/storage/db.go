@@ -19,7 +19,7 @@ import (
 var DB *ginkorm.Engine
 
 func init() {
-	e, err := ginkorm.NewEngine("sqlite3", filepath.Join(utils.GetGoRunPath(), "storage", "ginkblog_test.db"))
+	e, err := ginkorm.NewEngine("sqlite3", filepath.Join(utils.GetGoRunPath(), "storage", "ginkblog.db"))
 	if err != nil {
 		log.Error(err)
 		panic(err)
