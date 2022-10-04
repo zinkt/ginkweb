@@ -45,3 +45,7 @@ blockquote {
     padding: .5em;
     background-color: #f0f0f0;
 }
+
+footer {
+  font-size: small;
+}

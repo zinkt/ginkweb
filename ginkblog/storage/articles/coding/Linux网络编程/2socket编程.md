@@ -26,10 +26,8 @@ ssize_t read(int fd, void *buf, size_t nbytes);
 
 ## socket函数及数据类型
 
-```c
-#include <sys/socket.h>
+\#include \<sys/socket.h>
 int socket(int domain, int type, int protocol);
-```
 
 - domain此套接字要使用的协议族信息，主要为PF_INET?AF_INET
 - type数据传输的类型，流式SOCK_STREAM，或数据报式SOCK_DGRAM
@@ -64,7 +62,7 @@ s,l:shot,long(linux中long为4字节)
 
 ## 网络地址的初始化与分配
 
-\#include <arpa/inet.h>  
+\#include \<arpa/inet.h>  
 in_addr_t inet_addr(const char *string);
 
 - 成功时返回32位 **大端**序整数型值，失败时返回INADDR_NONE
@@ -225,7 +223,7 @@ ssize_t writev(int filedes, const struct iovec* iov, int iovcnt)
     + iovec
         * void* iov_base; 缓冲地址
         * size_t iov_len; 缓冲大小
-        *  ![iovec](img/iovec.png)
+;![iovec](img/iovec.png)
 - iovcnt第二个参数传递的数组长度
 
 ssize_t readv(int filedes, const struct iovec* iov, int iovcnt);

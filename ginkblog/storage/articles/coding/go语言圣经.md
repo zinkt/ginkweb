@@ -1,5 +1,3 @@
-[TOC]
-
 ## 入门
 
 ### I/O包
@@ -10,8 +8,6 @@
 var a int
 fmt.Scanf("%d", &a)
 ```
-
-
 
 #### bufio
 
@@ -65,8 +61,6 @@ func f() *int {
 ```go
 fmt.Println(f() == f()) // "false"
 ```
-
-
 
 #### 垃圾回收初探
 
@@ -627,7 +621,7 @@ var _ fmt.Stringer = s  // compile error: IntSet lacks String method
 
 ### 接口值
 
-## 接口值有两部分组成：具体类型和那个类型的值
+#### 接口值有两部分组成：具体类型和那个类型的值
 
 ![img](assets/ch7-01.png)
 ![img](assets/ch7-02.png)
@@ -684,6 +678,160 @@ if debug {
 }
 f(buf) // OK
 ```
+
+
+
+## 8 goroutine
+
+
+
+### 8.4 channels
+
+#### 无缓存的channels
+
+> 一个基于无缓存Channels的发送操作将导致发送者goroutine阻塞，直到另一个goroutine在相同的Channels上执行接收操作，当发送的值通过Channels成功传输之后，两个goroutine可以继续执行后面的语句。反之，如果接收操作先发生，那么接收者goroutine也将阻塞，直到有另一个goroutine在相同的Channels上执行发送操作。
+>
+> 基于无缓存Channels的发送和接收操作将导致两个goroutine做一次同步操作。因为这个原因，无缓存Channels有时候也被称为同步Channels。当通过一个无缓存Channels发送数据时，接收者收到数据发生在再次唤醒唤醒发送者goroutine之前
+
+#### 串联的channels（pipeline）
+
+#### 单方向的channel
+
+```
+chan<- int 只发送
+<-chan int 只接收
+```
+
+#### 带缓存的channels
+
+```
+ch = make(chan string, 3)
+cap(ch) //缓存容量
+len(ch) //队列中有效元素的个数（因为在并发程序中该信息会随着接收操作而失效，但是它对某些故障诊断和性能优化会有帮助。）
+```
+
+蛋糕店的比喻
+
+> Channel的缓存也可能影响程序的性能。想象一家蛋糕店有三个厨师，一个烘焙，一个上糖衣，还有一个将每个蛋糕传递到它下一个厨师的生产线。在狭小的厨房空间环境，每个厨师在完成蛋糕后必须等待下一个厨师已经准备好接受它；这类似于在一个无缓存的channel上进行沟通。
+>
+> 如果在每个厨师之间有一个放置一个蛋糕的额外空间，那么每个厨师就可以将一个完成的蛋糕临时放在那里而马上进入下一个蛋糕的制作中；这类似于将channel的缓存队列的容量设置为1。只要每个厨师的平均工作效率相近，那么其中大部分的传输工作将是迅速的，个体之间细小的效率差异将在交接过程中弥补。如果厨师之间有更大的额外空间——也是就更大容量的缓存队列——将可以在不停止生产线的前提下消除更大的效率波动，例如一个厨师可以短暂地休息，然后再加快赶上进度而不影响其他人。
+>
+> **另一方面，如果生产线的前期阶段一直快于后续阶段，那么它们之间的缓存在大部分时间都将是满的。相反，如果后续阶段比前期阶段更快，那么它们之间的缓存在大部分时间都将是空的。对于这类场景，额外的缓存并没有带来任何好处。**
+>
+> 生产线的隐喻对于理解channels和goroutines的工作机制是很有帮助的。例如，如果第二阶段是需要精心制作的复杂操作，一个厨师可能无法跟上第一个厨师的进度，或者是无法满足第三阶段厨师的需求。要解决这个问题，我们可以再雇佣另一个厨师来帮助完成第二阶段的工作，他执行相同的任务但是独立工作。这类似于基于相同的channels创建另一个独立的goroutine。
+
+
+
+### 8.5 并发的循环
+
+示例生成缩略图
+
+```go
+func makeThumbnails3(filenames []string) {
+    ch := make(chan struct{})
+    for _, f := range filenames {
+        go func(f string) {
+            thumbnail.ImageFile(f) // NOTE: ignoring errors
+            ch <- struct{}{}
+        }(f)
+    }
+    // Wait for goroutines to complete.(使main goroutine等待)
+    for range filenames {
+        <-ch
+    }
+}
+```
+
+为了知道最后一个goroutine什么时候结束（最后一个结束并不一定是最后一个开始），我们需要一个递增的计数器，在每一个goroutine启动时加一，在goroutine退出时减一。这需要一种特殊的计数器，这个计数器需要在多个goroutine操作时做到安全并且提供在其减为零之前一直等待的一种方法。这种计数类型被称为sync.WaitGroup 
+
+```
+var wg sync.WaitGroup
+wg.Add(1) // Add是为计数器加一，必须在worker goroutine开始之前调用，而不是在goroutine中
+defer wg.Done()
+wg.Wait()
+```
+
+### 8.7 基于select的多路复用
+
+```
+select {
+case <-ch1:
+    // ...
+case x := <-ch2:
+    // ...use x...
+case ch3 <- y:
+    // ...
+default:
+    // ...
+}
+```
+
+select会等待case中有能够执行的case时去执行。当条件满足时，select才会去通信并执行case之后的语句；这时候其它通信是不会执行的。一个没有任何case的select语句写作select{}，会永远地等待下去。 
+
+#### 倒计时的例子
+
+```
+func main() {
+	abort := make(chan struct{})
+	go func() {
+		os.Stdin.Read(make([]byte, 1))
+		abort <- struct{}{}
+	}()
+	fmt.Println("Commencing Countdown. Press return to abort")
+	tick := time.Tick(1 * time.Second)
+
+	for i := 10; i > 0; i-- {
+		fmt.Println(i)
+		select {
+		case <-tick:
+		case <-abort:
+			fmt.Println("Launch aborted!")
+			return
+		}
+	}
+}
+```
+
+但time.Tick()的goroutine在调用函数结束后仍然存活继续徒劳地尝试向channel中发送值，然而这时候已经没有其它的goroutine会从该channel中接收值了——这被称为goroutine泄露（§8.4.4）。
+
+Tick函数挺方便，但是只有当程序整个生命周期都需要这个时间时我们使用它才比较合适。否则的话，我们应该使用下面的这种模式：
+
+```
+ticker := time.NewTicker(1 * time.Second)
+<-ticker.C    // receive from the ticker's channel
+ticker.Stop() // cause the ticker's goroutine to terminate
+```
+
+#### select有default时
+
+这是一个非阻塞的接收操作；反复地做这样的操作叫做“轮询channel” 
+
+### 8.8 并发的目录遍历
+
+限制goroutine数目：通过分发token
+
+```
+var sema = make(chan struct{}, 20) //限制goroutine数量
+
+func dirents(dir string) []os.FileInfo {
+	sema <- struct{}{}        // 获取token
+	defer func() { <-sema }() //释放token
+	entries, err := ioutil.ReadDir(dir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "du1: %v\n", err)
+		return nil
+	}
+	return entries
+}
+```
+
+### 8.9 并发的退出
+
+不要向channel发送值，而是用关闭一个channel来进行广播
+
+
+
+
 
 
 

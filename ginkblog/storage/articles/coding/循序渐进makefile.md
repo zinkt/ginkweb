@@ -1,4 +1,4 @@
-# Makefile 1
+#### Makefile 1
 
 ```makefile
 hellomake: hellomake.c hellofunc.c 
@@ -10,7 +10,7 @@ hellomake: hellomake.c hellofunc.c
 
 为了提高效率，让我们尝试以下操作：
 
-# Makefile 2
+#### Makefile 2
 
 ```makefile
 CC=gcc 
@@ -23,7 +23,7 @@ hellomake: hellomake.o hellofunc.o
 
 对于大多数小型项目，使用这种形式的 makefile 就足够了。但是，缺少一件事：对包含文件的依赖。例如，如果您要对 hellomake.h 进行更改，make将不会重新编译 .c 文件，即使它们需要重新编译。为了解决这个问题，我们需要告诉make 所有 .c 文件都依赖于某些 .h 文件。我们可以通过编写一个简单的规则并将其添加到 makefile 中来做到这一点。
 
-# Makefile 3
+#### Makefile 3
 ```makefile
 CC=gcc 
 CFLAGS=-I。
@@ -39,7 +39,7 @@ hellomake: hellomake.o hellofunc.o
 
 作为最后一个简化，让我们使用专用宏$ @ 和$ ^，这是的左侧和右侧：分别，使整个编译规则比较一般。在下面的示例中，所有包含文件都应列为宏 DEPS 的一部分，所有目标文件都应列为宏 OBJ 的一部分。
 
-# Makefile 4
+#### Makefile 4
 
 ```makefile
 CC=gcc 
@@ -55,7 +55,7 @@ hellomake: $(OBJ)
 ```
 那么，如果我们想开始将 .h 文件放在 include 目录中，将源代码放在 src 目录中，将一些本地库放在 lib 目录中，该怎么办？另外，我们能否以某种方式隐藏那些无处不在的烦人的 .o 文件？答案当然是肯定的。以下 makefile 定义了 include 和 lib 目录的路径，并将目标文件放置在 src 目录中的 obj 子目录中。它还为您想要包含的任何库定义了一个宏，例如数学库 -lm。此生成文件应位于 src 目录中。请注意，如果您键入make clean，它还包括用于清理源目录和对象目录的规则。.PHONY 规则阻止make对名为 clean 的文件执行某些操作。
 
-# Makefile 5
+### Makefile 5
 
 ```makefile
 IDIR =../include 

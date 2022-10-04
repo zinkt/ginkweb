@@ -15,10 +15,12 @@
         .categorylink a:hover {
             text-decoration: underline;
         }
+
         .categorylink a {
             font-size: 1.2rem;
-            font-weight:600
+            font-weight: 600
         }
+
         a {
             text-decoration: none;
         }
@@ -27,7 +29,7 @@
 
 <body class="bg-dark text-light">
 
-{{template "layout/header" .}}
+    {{template "layout/header" .}}
 
     <!-- showcase -->
     <!-- 类中
@@ -65,13 +67,14 @@
     <section class="text-center p-5">
         <div class="d-block categorylink">
             <a class="text-light" href="/category/coding">🪄技术 |</a>
-            <a class="text-light" href="">🎈分享 |</a>
-            <a class="text-light" href="">🤔随想 |</a>
-            <a class="text-light" href="">🍉关于</a>
+            <a class="text-light" href="/category/share">🎈分享 |</a>
+            <a class="text-light" href="/category/thinking">🤔随想 |</a>
+            <a class="text-light" href="/archives/1">🍉关于</a>
         </div>
         <div class="d-block">
             <div class="p-3 p-md-4 btn-group toolstoys">
-                <button type="button" class="btn btn-primary" style="background-color: rgb(33,37,41);">Tools&Toys</button>
+                <button type="button" class="btn btn-primary"
+                    style="background-color: rgb(33,37,41);">Tools&Toys</button>
                 <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
                     data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgb(33,37,41) ;">
                 </button>
@@ -83,7 +86,7 @@
         </div>
     </section>
 
-
+    {{template "layout/footer" .}}
 
 
 </body>

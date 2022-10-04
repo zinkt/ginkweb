@@ -1,6 +1,4 @@
-
-
-## sqlite3
+### sqlite3使用
 
 ```bash
 sqlite3 gink.db #进入数据库
@@ -9,9 +7,7 @@ sqlite3 gink.db #进入数据库
 .schema User #查看建表sql
 ```
 
-
-
-## log
+### log
 
 封装了log标准库，主要部分：
 
@@ -24,16 +20,14 @@ var (
 )
 ```
 
-
-
-## Session
+### Session
 
 封装了database/sql 标准库的`Exec()`、`Query()` 和 `QueryRow()` 三个方法，主要目的是：
 
 1. 统一打印日志 （包括 执行的SQL 语句和错误日志） 
 2. 执行完成后，清空 `(s *Session).sql` 和 `(s *Session).sqlVars` 两个变量。这样 Session 可以复用，开启一次会话，可以执行多次 SQL。 
 
-## Engine
+### Engine
 
 主要完成数据库连接检查和关闭
 
@@ -43,11 +37,11 @@ func (engine *Engine) Close()
 func (engine *Engine) NewSession() *session.Session 
 ```
 
-## Dialect
+### Dialect
 
 将Go语言的类型映射为数据库中的类型
 
-### 抽象出各个数据库中的差异部分	dialect.go
+#### 抽象出各个数据库中的差异部分	dialect.go
 
 ```
 var dialectsMap = map[string]Dialect{}
@@ -60,7 +54,7 @@ func RegisterDialect(name string, dialect Dialect)
 func GetDialect(name string) (dialect Dialect, ok bool)
 ```
 
-### 增加对sqlite3的支持(实现dialect接口)	sqlite3.go
+#### 增加对sqlite3的支持(实现dialect接口)	sqlite3.go
 
 ```
 
@@ -71,9 +65,7 @@ func (s *sqlite3) DataTypeOf(typ reflect.Value) string
 func (s *sqlite3) TableExistSQL(tableName string) (string, []interface{})
 ```
 
-
-
-## Schema
+### Schema
 
 对象和表的转换
 
