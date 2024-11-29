@@ -5,7 +5,7 @@
 
 <head>
     {{template "layout/meta" .}}
-    <title>{{.category}} - zinkt</title>
+    <title>{{.category}} - rick sanchez</title>
 </head>
 
 <body>
@@ -25,13 +25,13 @@
                         <a href="/category/{{$art.Category}}">{{$art.Category}}</a> |
 
                         <i class="fa-solid fa-eye"></i>
-                        {{$art.Viewed}} 浏览 |
+                        {{$art.Viewed}} views |
                     </p>
                     <section class="border border-1 px-4 pt-4">
                         <div class="markdown-body entry-content" id="post-content">{{$art.Content |
                             Unescaped}}</div>
                         <p class="more pt-3 non-decoration-link">
-                            <a href="/archives/{{$art.Id}}">查看更多-></a>
+                            <a href="/archives/{{$art.Id}}">more-></a>
                         </p>
                     </section>
                 </article>

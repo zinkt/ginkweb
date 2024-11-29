@@ -12,11 +12,9 @@
 }
 
 body {
-  /* 占位nav fixed-top */
   padding-top: 56px;
 }
 
-/* 锚点定位偏移 */
 html {
   scroll-padding-top: 66px;
 }

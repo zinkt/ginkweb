@@ -68,7 +68,7 @@
 
 	function play() {
 	  var genetitle = document.getElementById('genetitle');
-	  var history = (0, _gen2.default)('zinkt').history;
+	  var history = (0, _gen2.default)('rick sanchez').history;
 	  isRunning = true;
 	  var i = 0;
 	  history.forEach(function (text, i) {

@@ -4,7 +4,7 @@
 
 <head>
     {{template "layout/meta" .}}
-    <title>{{.article.Title}} - zinkt</title>
+    <title>{{.article.Title}} - rick sanchez</title>
 </head>
 
 <body>
@@ -22,14 +22,13 @@
                         <a href="/category/{{.article.Category}}">{{.article.Category}}</a> |
 
                         <i class="fa-solid fa-eye"></i>
-                        {{.article.Viewed}} 浏览 |
+                        {{.article.Viewed}} Views |
                     </p>
                     <section class="border border-1 px-4 pt-4">
-                        <!-- 文章正文 -->
                         <div class="markdown-body entry-content" id="post-content">{{.article.Content | Unescaped}}</div>
                     </section>
                     <blockquote class="my-3">
-                        编辑于{{.article.LastUpdateTime | FormatAsDate}}
+                        Last edit at{{.article.LastUpdateTime | FormatAsDate}}
                     </blockquote>
 
                 </article>

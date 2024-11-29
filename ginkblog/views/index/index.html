@@ -5,7 +5,7 @@
 
 <head>
     {{template "layout/meta" .}}
-    <title>zinkt</title>
+    <title>rick sanchez</title>
     <style type="text/css">
         #genetitle,
         #genetext {
@@ -27,63 +27,24 @@
     </style>
 </head>
 
-<body class="bg-dark text-light">
+<body class="bg-light text">
 
     {{template "layout/header" .}}
 
-    <!-- showcase -->
-    <!-- 类中
-        p-5：四周5
-        pt：padding-top
-        pb：padding-bottom
-        px：padding on x-axis 左和右
-        py：padding on y-axis 上和下
-        m-4：margin 4
-    -->
     <section class=" p-sm-5 mt-sm-2 text-center">
         <div class="container pt-sm-5">
-            <!-- 
-                align-items-center :垂直方向对齐
-             -->
+
             <div class="d-sm-flex align-items-center justify-content-around">
                 <div class="p-3">
-                    <h1 class="my-3" id="genetitle">zinkt</h1>
-                    <p class="lead text-nowrap" id="genetext">
-                        Follow your curiosity :)
-                    </p>
-                    <a href="https://github.com/huzidaha/home" class="text-dark small">Follow your
-                        curiosity, and you can find out how it works</a>
-                </div>
-                <!-- 
-                    d 表示display
-                    d-sm-block 大于sm的时候以block来display
-                -->
-                <img class="img-fluid rounded-3 w-50" src="../static/img/cute-link.jpg" alt="">
+                    <h1 class="my-3" id="genetitle">rick sanchez</h1>
+                <img class="img-fluid rounded-3 w-50" src="../static/img/jinx.webp" alt="">
             </div>
         </div>
     </section>
 
     <!-- category -->
     <section class="text-center p-5">
-        <div class="d-block categorylink">
-            <a class="text-light" href="/category/coding">⚽技术 |</a>
-            <a class="text-light" href="/category/share">🎈分享 |</a>
-            <a class="text-light" href="/category/thinking">🤔随想 |</a>
-            <a class="text-light" href="/archives/1">🍉关于</a>
-        </div>
-        <div class="d-block">
-            <div class="p-3 p-md-4 btn-group toolstoys">
-                <button type="button" class="btn btn-primary"
-                    style="background-color: rgb(33,37,41);">Tools&Toys</button>
-                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                    data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgb(33,37,41) ;">
-                </button>
-                <ul class="dropdown-menu dropdown-menu-dark text-center">
-                    <li><a class="dropdown-item" href="#">文件投送</a></li>
-                    <li><a class="dropdown-item" href="#">...</a></li>
-                </ul>
-            </div>
-        </div>
+
     </section>
 
     {{template "layout/footer" .}}
