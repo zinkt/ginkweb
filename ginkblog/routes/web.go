@@ -44,11 +44,11 @@ func InitWeb() *gink.Engine {
 
 	archives := g.Group("/archives")
 	{
-		archives.GET("/", nil)
+		// archives.GET("/", nil)
 		archives.GET("/:aid", controllers.ArticleDetailById)
 	}
 
-	g.GET("/about", nil)
+	// g.GET("/about", nil)
 
 	return g
 }
