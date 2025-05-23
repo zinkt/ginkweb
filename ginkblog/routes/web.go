@@ -52,5 +52,11 @@ func InitWeb() *gink.Engine {
 
 	// g.GET("/about", nil)
 
+	// WebSocket chat route
+	g.GET("/ws/chat", controllers.Chat)
+
+	// Page to test chat
+	g.GET("/chat", controllers.ChatRoomPage)
+
 	return g
 }

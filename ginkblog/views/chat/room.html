@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>多房间聊天室</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding-top: 20px; }
+    #messages {
+      height: 300px;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #f9f9f9; /* Light gray background for the chat area */
+      display: flex; /* Use flexbox for messages */
+      flex-direction: column; /* Stack messages vertically */
+    }
+    .message {
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      border-radius: 15px; /* Rounded corners for bubbles */
+      max-width: 70%; /* Max width for messages */
+      word-wrap: break-word; /* Break long words */
+      display: inline-block; /* Allow width to wrap content */
+      /* Removed text-align from here, will be handled by flex alignment */
+    }
+    .my-message {
+      background-color: #007bff; /* Blue background for my messages */
+      color: white;
+      align-self: flex-end; /* Align my messages to the right */
+    }
+    .other-message {
+      background-color: #e9ecef; /* Lighter gray for other messages */
+      color: #333;
+      align-self: flex-start; /* Align other messages to the left */
+    }
+    .sender {
+      font-weight: bold;
+      font-size: 0.9em;
+      margin-bottom: 4px;
+      margin-right: 8px;
+    }
+    .meta {
+      font-size: 0.8em;
+      color: #6c757d;
+    }
+    .sender-line {
+      margin-bottom: 4px;
+    }
+    .content {
+      /* Styles for actual message content if needed */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mb-4">多房间聊天室</h1>
+    <div class="row">
+      <div class="col-md-4">
+        <h2>连接信息</h2>
+        <div class="form-group">
+          <label for="userID">用户ID:</label>
+          <input type="text" class="form-control" id="userID" value="user1">
+        </div>
+        <div class="form-group">
+          <label for="roomID">房间ID:</label>
+          <input type="text" class="form-control" id="roomID" value="roomA">
+        </div>
+        <button id="connectBtn" class="btn btn-success">连接</button>
+        <button id="disconnectBtn" class="btn btn-danger" disabled>断开连接</button>
+      </div>
+      <div class="col-md-8">
+        <h2>消息</h2>
+        <div id="messages"></div>
+        <div class="input-group mb-3">
+          <input type="text" class="form-control" id="messageInput" placeholder="输入消息..." disabled>
+          <div class="input-group-append">
+            <button id="sendBtn" class="btn btn-primary" disabled>发送</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const userIDInput    = document.getElementById('userID');
+    const roomIDInput    = document.getElementById('roomID');
+    const connectBtn     = document.getElementById('connectBtn');
+    const disconnectBtn  = document.getElementById('disconnectBtn');
+    const messageInput   = document.getElementById('messageInput');
+    const sendBtn        = document.getElementById('sendBtn');
+    const messagesDiv    = document.getElementById('messages');
+    let ws;
+    let currentUserID = ''; // Store current user's ID
+
+    function addMessage(msgData, isMe = false) {
+      const msgElement = document.createElement('div');
+      msgElement.classList.add('message');
+
+      const senderLine = document.createElement('div');
+      senderLine.classList.add('sender-line');
+
+      const senderElement = document.createElement('span'); // Changed to span for inline display
+      senderElement.classList.add('sender');
+
+      const metaElement = document.createElement('span'); // Changed to span for inline display
+      metaElement.classList.add('meta');
+      let metaText = '';
+      if (msgData.timestamp) {
+        metaText += msgData.timestamp + ' ';
+      }
+      if (msgData.userIP) {
+        metaText += '(' + msgData.userIP + ')';
+      }
+      metaElement.textContent = metaText.trim();
+
+      if (isMe) {
+        msgElement.classList.add('my-message');
+        senderElement.textContent = '我 (' + msgData.userID + ')';
+      } else {
+        msgElement.classList.add('other-message');
+        senderElement.textContent = msgData.userID;
+      }
+      
+      senderLine.appendChild(senderElement);
+      senderLine.appendChild(metaElement);
+
+      const contentElement = document.createElement('div');
+      contentElement.classList.add('content');
+      contentElement.textContent = msgData.content;
+
+      msgElement.appendChild(senderLine);
+      msgElement.appendChild(contentElement);
+      messagesDiv.appendChild(msgElement);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    connectBtn.onclick = () => {
+      console.log("Connect button clicked!");
+      const userID = userIDInput.value.trim();
+      const roomID = roomIDInput.value.trim();
+      currentUserID = userID; // Store for identifying self messages
+
+      if (!userID || !roomID) {
+        alert('请输入用户ID和房间ID');
+        return;
+      }
+
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsURL = wsProtocol + '//' + window.location.host + '/ws/chat?userID=' + encodeURIComponent(userID) + '&roomID=' + encodeURIComponent(roomID);
+      
+      addMessage({userID: 'System', content: '正在连接到 ' + wsURL + ' ...', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }, true);
+      ws = new WebSocket(wsURL);
+
+      ws.onopen = function(event) {
+        addMessage({ userID: currentUserID, content: '连接成功！', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }, true);
+        connectBtn.disabled    = true;
+        disconnectBtn.disabled = false;
+        messageInput.disabled  = false;
+        sendBtn.disabled       = false;
+        userIDInput.disabled   = true;
+        roomIDInput.disabled   = true;
+      };
+
+      ws.onmessage = function(event) {
+        try {
+          const msgData = JSON.parse(event.data); // msgData will have userID, content, timestamp, userIP
+          addMessage(msgData, false);
+        } catch (e) {
+          console.error("Error parsing message data:", e);
+          addMessage({userID: 'System', content: event.data, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }); 
+        }
+      };
+
+      ws.onclose = function(event) {
+        let reasonText = event.reason ? (', reason=' + event.reason) : '';
+        const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        addMessage({userID: 'System', content: '连接已断开。', timestamp: currentTime});
+        if (event.wasClean) {
+          addMessage({userID: 'System', content: '连接正常关闭, code=' + event.code + reasonText, timestamp: currentTime});
+        } else {
+          addMessage({userID: 'System', content: '连接意外断开', timestamp: currentTime});
+        }
+        connectBtn.disabled    = false;
+        disconnectBtn.disabled = true;
+        messageInput.disabled  = true;
+        sendBtn.disabled       = true;
+        userIDInput.disabled   = false;
+        roomIDInput.disabled   = false;
+      };
+
+      ws.onerror = function(error) {
+        addMessage({userID: 'System', content: 'WebSocket 错误: ' + (error.message || '未知错误'), timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) });
+      };
+    };
+
+    disconnectBtn.onclick = () => {
+      if (ws) ws.close();
+    };
+
+    sendBtn.onclick = () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        const messageText = messageInput.value;
+        if (messageText.trim() === '') return;
+        ws.send(messageText); 
+        addMessage({userID: currentUserID, content: messageText, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }, true); 
+        messageInput.value = '';
+      } else {
+        addMessage({userID: 'System', content: '尚未连接, 无法发送信息', timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) });
+      }
+    };
+
+    messageInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+  </script>
+</body>
+</html>

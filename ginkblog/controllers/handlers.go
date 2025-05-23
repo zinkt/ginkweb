@@ -94,3 +94,8 @@ func ArticleListPage(c *gink.Context) {
 	}
 	c.HTML(http.StatusOK, "article/list", data)
 }
+
+// ChatRoomPage renders the chat room HTML page.
+func ChatRoomPage(c *gink.Context) {
+	c.HTML(http.StatusOK, "room.html", nil)
+}
