@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -36,6 +37,11 @@ func mytest() {
 func ginkblogDemo() {
 	storage.CheckAndSnycArticles()
 	g := routes.InitWeb()
+	go func() {
+		if err := g.Run_https(":443"); err != nil {
+			log.Fatal("HTTPS failed:", err)
+		}
+	}()
 	g.Run(":80")
 }
 

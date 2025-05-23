@@ -14,6 +14,7 @@ func InitWeb() *gink.Engine {
 
 	// 注册中间件
 	g.Use(gink.Logger(), gink.Recovery())
+
 	// 添加自定义模板渲染函数
 	g.SetFuncMap(template.FuncMap{
 		"FormatAsDate": utils.FormatAsDate,
@@ -24,6 +25,7 @@ func InitWeb() *gink.Engine {
 
 	// 此处filepath.Join()会Clean掉多余的separator，插入"OS specific Separator"
 	g.Static("/static", filepath.Join(utils.GetGoRunPath(), "static"))
+	g.Static("/.well-known", filepath.Join(utils.GetGoRunPath(), ".well-known"))
 	g.StaticFile("/favicon.ico", filepath.Join(utils.GetGoRunPath(), "static", "img", "favicon.ico"))
 	g.LoadHTMLGlob(filepath.Join(utils.GetGoRunPath(), "views", "*", "*.html"))
 

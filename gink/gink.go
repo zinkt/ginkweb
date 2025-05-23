@@ -134,6 +134,10 @@ func (engine *Engine) Run(addr string) (err error) {
 	return http.ListenAndServe(addr, engine)
 }
 
+func (engine *Engine) Run_https(addr string) (err error) {
+	return http.ListenAndServeTLS(addr, "ssl/cert.pem", "ssl/key.pem", engine)
+}
+
 // 实现了ServeHTTP接口，用于接管所有http请求
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var middlewares []HandlerFunc
